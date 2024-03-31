@@ -71,6 +71,7 @@ class Queue:
         else:
             return self._items.pop(0)
 
+
 class _Vertex:
     """A vertex in a graph.
 
@@ -197,7 +198,6 @@ def load_unweighted_friend_network(names_file: str, edges_file: str) -> Graph:
 
             graph.add_edge(people[user1], people[user2])
 
-    print(people)
     return graph
 
 
@@ -212,6 +212,6 @@ if __name__ == '__main__':
     import python_ta
     python_ta.check_all(config={
         'extra-imports': ['random'],  # the names (strs) of imported modules
-        'allowed-io': ['load_friend_network'],  # the names (strs) of functions that call print/open/input
+        'allowed-io': ['load_unweighted_friend_network'],  # the names (strs) of functions that call print/open/input
         'max-line-length': 120
     })
