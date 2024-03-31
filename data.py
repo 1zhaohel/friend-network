@@ -108,6 +108,19 @@ class Graph:
         else:
             raise ValueError
 
+def load_friend_network(names_file: str, edges_file: str) -> Graph:
+    """Return a friend network graph corresponding to the given datasets.
+
+    Preconditions:
+        - names_file is the path to a txt file corresponding to a list of first names
+        - edges_file is the path to a CSV file corresponding to the book data
+          format described on the assignment handout
+    """
+    # open the edges file, assign names to unique numbers, build graph (connect ego with everyone)
+    people = {0: ""}
+    with open(names_file) as f1, open(edges_file) as f2:
+
+
 
 if __name__ == '__main__':
     import doctest
