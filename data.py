@@ -122,6 +122,9 @@ def load_friend_network(names_file: str, edges_file: str) -> Graph:
 
 
 
+
+
+
 if __name__ == '__main__':
     import doctest
     doctest.testmod(verbose=True)
