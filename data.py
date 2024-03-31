@@ -158,7 +158,40 @@ class Graph:
             raise ValueError
 
 
+def load_friend_network(names_file: str, edges_file: str) -> Graph:
+    """Return a friend network graph corresponding to the given datasets.
 
+    Preconditions:
+        - names_file is the path to a txt file corresponding to a list of first names
+        - edges_file is the path to a txt file corresponding to the edges of the friend network
+    """
+    people = {}
+    graph = Graph()
+    graph.add_vertex('raven')
+
+    with open(names_file) as f1, open(edges_file) as f2:
+        names = f1.readlines()
+        i = 0
+
+        for line in f2:
+            split_line = line.strip().split()
+            user1, user2 = split_line[0], split_line[1]
+
+            # map new user to name, add user to graph, create edge between user and ego (raven)
+            if user1 not in people:
+                people[user1] = names[i].strip()
+                i += 1
+                graph.add_vertex(people[user1])
+                graph.add_edge(people[user1], 'raven')
+            if user2 not in people:
+                people[user2] = names[i].strip()
+                i += 1
+                graph.add_vertex(people[user2])
+                graph.add_edge(people[user2], 'raven')
+
+            graph.add_edge(people[user1], people[user2])
+
+    return graph
 
 
 if __name__ == '__main__':
@@ -172,6 +205,6 @@ if __name__ == '__main__':
     import python_ta
     python_ta.check_all(config={
         'extra-imports': [],  # the names (strs) of imported modules
-        'allowed-io': [],  # the names (strs) of functions that call print/open/input
+        'allowed-io': ['load_friend_network'],  # the names (strs) of functions that call print/open/input
         'max-line-length': 120
     })
