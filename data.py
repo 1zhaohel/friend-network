@@ -21,6 +21,8 @@ from __future__ import annotations
 from typing import Any
 import random
 
+import networkx as nx
+
 
 class Queue:
     """A first-in-first-out (FIFO) queue of items.
@@ -158,6 +160,24 @@ class Graph:
             return {neighbour.item for neighbour in v.neighbours}
         else:
             raise ValueError
+
+    def conv_networkx(self, max_vertices: int = 5000) -> nx.Graph:
+        """Convert this graph to a networkx graph, limiting it to max_vertices."""
+        graph_nx = nx.Graph()
+        for v in self._vertices.values():
+            graph_nx.add_node(v.item)
+
+            for u in v.neighbours:
+                if graph_nx.number_of_nodes() < max_vertices:
+                    graph_nx.add_node(u.item)
+
+                if u.item in graph_nx.nodes:
+                    graph_nx.add_edge(v.item, u.item)
+
+            if graph_nx.number_of_nodes() >= max_vertices:
+                break
+
+        return graph_nx
 
 
 class _WeightedVertex(_Vertex):
