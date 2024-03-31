@@ -22,17 +22,16 @@ from plotly.graph_objs import Scatter, Figure
 
 import data
 
-
 LINE_COLOUR = 'rgb(210,210,210)'
 VERTEX_BORDER_COLOUR = 'rgb(50, 50, 50)'
 BOOK_COLOUR = 'rgb(89, 205, 105)'
 USER_COLOUR = 'rgb(105, 89, 205)'
 
 
-def visualize_graph(graph: data.Graph,
+def visualize_graph(graph_tuple: tuple[data.Graph, data.WeightedGraph],
                     layout: str = 'spring_layout',
                     max_vertices: int = 5000,
-                    output_file: str = '') -> None:
+                    output_file: str = '', weighted: bool = False) -> None:
     """Use plotly and networkx to visualize the given graph.
 
     Optional arguments:
@@ -41,6 +40,11 @@ def visualize_graph(graph: data.Graph,
         - output_file: a filename to save the plotly image to (rather than displaying
             in your web browser)
     """
+    if weighted:
+        graph = graph_tuple[1]
+    else:
+        graph = graph_tuple[0]
+
     graph_nx = graph.conv_networkx(max_vertices)
 
     pos = getattr(nx, layout)(graph_nx)
