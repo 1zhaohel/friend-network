@@ -20,7 +20,6 @@ This file is Copyright (c) 2024 CSC111 Teaching Team
 import networkx as nx
 from plotly.graph_objs import Scatter, Figure
 
-import compute
 import data
 
 
