@@ -290,7 +290,7 @@ def load_friend_network(names_file: str, edges_file: str) -> tuple[Graph, Weight
 
     with open(names_file) as f1, open(edges_file) as f2:
         names = f1.readlines()
-        i = random.randint(0, len(names))
+        i = random.randint(0, len(names) - 1)
 
         for line in f2:
             split_line = line.strip().split()
@@ -300,7 +300,7 @@ def load_friend_network(names_file: str, edges_file: str) -> tuple[Graph, Weight
             if user1 not in people:
                 people[user1] = names[i].strip()
                 names.pop(i)
-                i = random.randint(0, len(names))
+                i = random.randint(0, len(names) - 1)
 
                 unweighted_network.add_vertex(people[user1])
                 unweighted_network.add_edge(people[user1], 'raven')
@@ -311,7 +311,7 @@ def load_friend_network(names_file: str, edges_file: str) -> tuple[Graph, Weight
             if user2 not in people:
                 people[user2] = names[i].strip()
                 names.pop(i)
-                i = random.randint(0, len(names))
+                i = random.randint(0, len(names) - 1)
 
                 unweighted_network.add_vertex(people[user2])
                 unweighted_network.add_edge(people[user2], 'raven')
@@ -333,9 +333,9 @@ if __name__ == '__main__':
     # (In PyCharm, select the lines below and press Ctrl/Cmd + / to toggle comments.)
     # You can use "Run file in Python Console" to run PythonTA,
     # and then also test your methods manually in the console.
-    import python_ta
-    python_ta.check_all(config={
-        'extra-imports': ['random'],  # the names (strs) of imported modules
-        'allowed-io': ['load_friend_network'],  # the names (strs) of functions that call print/open/input
-        'max-line-length': 120
-    })
+    # import python_ta
+    # python_ta.check_all(config={
+    #     'extra-imports': ['random'],  # the names (strs) of imported modules
+    #     'allowed-io': ['load_friend_network'],  # the names (strs) of functions that call print/open/input
+    #     'max-line-length': 120
+    # })
