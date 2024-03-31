@@ -16,3 +16,54 @@ please consult our Course Syllabus.
 
 This file is Copyright (c) 2024 CSC111 Teaching Team
 """
+import data
+from data import Queue
+
+
+def get_friend_path(graph: data.Graph, start: str, end: str) -> list[str]:
+    """Returns the shortest path of mutuals between 2 people in the graph
+
+    If there is no path, returns an empty list
+    """
+    # TODO: implement public get graph size method
+    prev = get_parents(graph._vertices[start])
+
+    return []
+
+
+def get_parents(start: data._Vertex):
+    # TODO: type annotations
+    """Gets the path but backwards ig???
+    """
+    queue = Queue()
+    queue.enqueue(start)
+
+    visited = {start}
+    parents = {}
+
+    while not queue.is_empty():
+        parent = queue.dequeue()
+
+        for neighbour in parent.neighbours:
+            if neighbour not in visited:
+                visited.add(neighbour)
+                queue.enqueue(neighbour)
+                parents[neighbour] = parent
+
+    return parents
+
+
+def reconstructPath(start: data._Vertex, end:data._Vertex, parents):
+    path = []
+    current = end
+
+    while current != end:
+        if current not in parents:
+            return []
+        path.append(current)
+        current = parents[current]
+
+    path.append(start)
+    path.reverse()
+
+    return [person.item for person in path]
