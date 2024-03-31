@@ -19,6 +19,7 @@ This file is Copyright (c) 2024 CSC111 Teaching Team
 """
 from __future__ import annotations
 from typing import Any
+import random
 
 
 class _Vertex:
@@ -109,7 +110,7 @@ class Graph:
             raise ValueError
 
 
-def load_friend_network(names_file: str, edges_file: str) -> Graph:
+def load_unweighted_friend_network(names_file: str, edges_file: str) -> Graph:
     """Return a friend network graph corresponding to the given datasets.
 
     Preconditions:
@@ -122,7 +123,7 @@ def load_friend_network(names_file: str, edges_file: str) -> Graph:
 
     with open(names_file) as f1, open(edges_file) as f2:
         names = f1.readlines()
-        i = 0
+        i = random.randint(0, len(names))
 
         for line in f2:
             split_line = line.strip().split()
@@ -131,17 +132,23 @@ def load_friend_network(names_file: str, edges_file: str) -> Graph:
             # map new user to name, add user to graph, create edge between user and ego (raven)
             if user1 not in people:
                 people[user1] = names[i].strip()
-                i += 1
+                names.pop(i)
+                i = random.randint(0, len(names))
+
                 graph.add_vertex(people[user1])
                 graph.add_edge(people[user1], 'raven')
+
             if user2 not in people:
                 people[user2] = names[i].strip()
-                i += 1
+                names.pop(i)
+                i = random.randint(0, len(names))
+
                 graph.add_vertex(people[user2])
                 graph.add_edge(people[user2], 'raven')
 
             graph.add_edge(people[user1], people[user2])
 
+    print(people)
     return graph
 
 
@@ -155,7 +162,7 @@ if __name__ == '__main__':
     # and then also test your methods manually in the console.
     import python_ta
     python_ta.check_all(config={
-        'extra-imports': [],  # the names (strs) of imported modules
+        'extra-imports': ['random'],  # the names (strs) of imported modules
         'allowed-io': ['load_friend_network'],  # the names (strs) of functions that call print/open/input
         'max-line-length': 120
     })
