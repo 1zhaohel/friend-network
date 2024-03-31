@@ -19,27 +19,31 @@ This file is Copyright (c) 2024 CSC111 Teaching Team
 import data
 from data import Queue
 
+# TODO: add these functions as methods in Graph class
+
 
 def get_friend_path(graph: data.Graph, start: str, end: str) -> list[str]:
     """Returns the shortest path of mutuals between 2 people in the graph
 
     If there is no path, returns an empty list
     """
-    # TODO: implement public get graph size method
-    prev = get_parents(graph._vertices[start])
+    start_vertex = graph._vertices[start]
+    end_vertex = graph._vertices[end]
+    parents = get_parents(start_vertex)
 
-    return []
+    return reconstruct_path(start_vertex, end_vertex, parents)
 
 
-def get_parents(start: data._Vertex):
-    # TODO: type annotations
-    """Gets the path but backwards ig???
+def get_parents(start: data._Vertex) -> dict[_Vertex, _Vertex]:
+    """Returns a dictionary containing vertices (keys) which link back to their
+    "parent nodes" (values) from bfs graph traversal
     """
     queue = Queue()
     queue.enqueue(start)
 
     visited = {start}
     parents = {}
+    parents_with_str = {}
 
     while not queue.is_empty():
         parent = queue.dequeue()
@@ -49,15 +53,23 @@ def get_parents(start: data._Vertex):
                 visited.add(neighbour)
                 queue.enqueue(neighbour)
                 parents[neighbour] = parent
+                parents_with_str[neighbour.item] = parent.item
 
     return parents
 
 
-def reconstructPath(start: data._Vertex, end:data._Vertex, parents):
+def reconstruct_path(start: data._Vertex, end: data._Vertex, parents) -> list[str]:
+    """Reconstructs the shortest path between start to end by going backwards in the parents
+    dictionary starting from the end vertex.
+
+    The path is a list containing the items of the vertices
+
+    If there is no path between start and end, returns an empty list
+    """
     path = []
     current = end
 
-    while current != end:
+    while current != start:
         if current not in parents:
             return []
         path.append(current)
@@ -67,3 +79,36 @@ def reconstructPath(start: data._Vertex, end:data._Vertex, parents):
     path.reverse()
 
     return [person.item for person in path]
+
+
+# FUNCTOIN FOR TESTING PURPOSES
+def test_graph():
+    g = data.Graph()
+    # names = ['a', 'b', 'c', 'd', 'e']
+    # edges = [['a', 'b'], ['a', 'c'], ['a', 'e'], ['b', 'c'], ['c', 'd'], ['c', 'e']]
+
+    names = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i']
+    edges = [['a', 'b'], ['a', 'c'], ['a', 'd'], ['b', 'f'], ['b', 'c'], ['f', 'g'], ['c', 'g'], ['c', 'h'], ['d', 'h'], ['h', 'i']]
+
+    for name in names:
+        g.add_vertex(name)
+    for edge in edges:
+        g.add_edge(edge[0], edge[1])
+
+    print(get_friend_path(g, 'a', 'e'))
+
+
+if __name__ == '__main__':
+    import doctest
+    doctest.testmod(verbose=True)
+
+    # When you are ready to check your work with python_ta, uncomment the following lines.
+    # (In PyCharm, select the lines below and press Ctrl/Cmd + / to toggle comments.)
+    # You can use "Run file in Python Console" to run PythonTA,
+    # and then also test your methods manually in the console.
+    import python_ta
+    python_ta.check_all(config={
+        'extra-imports': [],  # the names (strs) of imported modules
+        'allowed-io': [],  # the names (strs) of functions that call print/open/input
+        'max-line-length': 120
+    })
