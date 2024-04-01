@@ -26,19 +26,23 @@ import math
 # TODO: add these functions as methods in Graph class
 
 
-def get_friend_path(graph: data.Graph, start: str, end: str) -> list[str]:
+def get_friend_path(graph: data.Graph, start: str, end: str, type = "unweighted") -> list[str]:
     """Returns the shortest path of mutuals between 2 people in the graph
 
     If there is no path, returns an empty list
     """
     start_vertex = graph._vertices[start]
     end_vertex = graph._vertices[end]
-    parents = get_parents_weighted(start_vertex)
+
+    if type == "unweighted":
+        parents = get_parents(start_vertex)
+    else:
+        parents = get_parents_weighted(start_vertex, end_vertex)
 
     return reconstruct_path(start_vertex, end_vertex, parents)
 
 
-def get_parents_weighted(start: data._Vertex, end:data._Vertex) -> dict[data._Vertex, data._Vertex]:
+def get_parents_weighted(start: data._WeightedVertex, end:data._WeightedVertex) -> dict[data._WeightedVertex, data._WeightedVertex]:
     """Uses Djikstra's algorithm to return a dictionary containing vertices (keys) which link back to their
     "parent nodes" (values).
     """
@@ -46,10 +50,10 @@ def get_parents_weighted(start: data._Vertex, end:data._Vertex) -> dict[data._Ve
     distances = {start: 0}
     prev = {}
     priority_queue = PriorityQueue()
-    priority_queue.put((0, start))
+    priority_queue.put((0, id(start), start))
 
     while not priority_queue.empty():
-        vertex, distance = priority_queue.get()
+        distance, _, vertex = priority_queue.get()
         visited.add(vertex)
         if distances[vertex] < distance:
             continue
@@ -65,7 +69,10 @@ def get_parents_weighted(start: data._Vertex, end:data._Vertex) -> dict[data._Ve
             if new_distance < distances[neighbour]:
                 prev[neighbour] = vertex
                 distances[neighbour] = new_distance
-                priority_queue.put((new_distance, neighbour))
+                priority_queue.put((new_distance, id(neighbour), neighbour))
+
+        if vertex == end:
+            return prev
 
     return prev
 
@@ -117,12 +124,13 @@ def reconstruct_path(start: data._Vertex, end: data._Vertex, parents) -> list[st
 
 # FUNCTION FOR TESTING PURPOSES
 def test_graph():
-    g = data.Graph()
-    # names = ['a', 'b', 'c', 'd', 'e']
-    # edges = [['a', 'b'], ['a', 'c'], ['a', 'e'], ['b', 'c'], ['c', 'd'], ['c', 'e']]
+    # g = data.Graph()
+    names = ['a', 'b', 'c', 'd', 'e']
+    edges = [['a', 'b'], ['a', 'c'], ['a', 'e'], ['b', 'c'], ['c', 'd'], ['c', 'e']]
 
-    names = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i']
-    edges = [['a', 'b'], ['a', 'c'], ['a', 'd'], ['b', 'f'], ['b', 'c'], ['f', 'g'], ['c', 'g'], ['c', 'h'], ['d', 'h'], ['h', 'i']]
+    g = data.WeightedGraph()
+    # names = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i']
+    # edges = [['a', 'b', 1], ['a', 'c', 1], ['a', 'd', 1], ['b', 'f', 1], ['b', 'c', 1], ['f', 'g', 1], ['c', 'g', 1], ['c', 'h', 1], ['d', 'h', 1], ['h', 'i', 1]]
 
     for name in names:
         g.add_vertex(name)
