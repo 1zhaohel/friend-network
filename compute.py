@@ -16,6 +16,8 @@ please consult our Course Syllabus.
 
 This file is Copyright (c) 2024 CSC111 Teaching Team
 """
+import networkx as nx
+
 import data
 from data import Queue
 from queue import PriorityQueue
@@ -113,7 +115,7 @@ def reconstruct_path(start: data._Vertex, end: data._Vertex, parents) -> list[st
     return [person.item for person in path]
 
 
-# FUNCTOIN FOR TESTING PURPOSES
+# FUNCTION FOR TESTING PURPOSES
 def test_graph():
     g = data.Graph()
     # names = ['a', 'b', 'c', 'd', 'e']

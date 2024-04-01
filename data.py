@@ -1,10 +1,10 @@
-"""CSC111 Winter 2024 Project 2: Reading Data (Part 1)
+"""CSC111 Winter 2024 Project 2: Reading Data and Constructing Graphs (Part 1)
 
 Instructions (READ THIS FIRST!)
 ===============================
 
-This Python module contains classes responsible for reading data from our dataset
-and creating a graph.
+This Python module contains classes and functions responsible for reading data from our dataset
+and creating an unweighted and weighted graph.
 
 Copyright and Usage Information
 ===============================
@@ -20,6 +20,8 @@ This file is Copyright (c) 2024 CSC111 Teaching Team
 from __future__ import annotations
 from typing import Any
 import random
+
+import networkx as nx
 
 
 class Queue:
@@ -159,8 +161,119 @@ class Graph:
         else:
             raise ValueError
 
+    def conv_networkx(self, max_vertices: int = 5000) -> nx.Graph:
+        """Convert this graph to a networkx graph, limiting it to max_vertices."""
+        graph_nx = nx.Graph()
+        for v in self._vertices.values():
+            graph_nx.add_node(v.item)
 
-def load_unweighted_friend_network(names_file: str, edges_file: str) -> Graph:
+            for u in v.neighbours:
+                if graph_nx.number_of_nodes() < max_vertices:
+                    graph_nx.add_node(u.item)
+
+                if u.item in graph_nx.nodes:
+                    graph_nx.add_edge(v.item, u.item)
+
+            if graph_nx.number_of_nodes() >= max_vertices:
+                break
+
+        return graph_nx
+
+
+class _WeightedVertex(_Vertex):
+    """A vertex in a weighted graph.
+
+    Same documentation as _Vertex, except now neighbours is a dictionary mapping
+    a neighbour vertex to the weight of the edge to from self to that neighbour.
+    Note that for this project, the weights will be integers between 1 and 5 indicating
+    the vertex's closeness to their neighbours.
+
+    Instance Attributes:
+        - item: The data stored in this vertex, representing a user.
+        - neighbours: The vertices that are adjacent to this vertex, and their corresponding
+            edge weights.
+
+    Representation Invariants:
+        - self not in self.neighbours
+        - all(self in u.neighbours for u in self.neighbours)
+    """
+    item: Any
+    neighbours: dict[_WeightedVertex, int]
+
+    def __init__(self, item: Any) -> None:
+        """Initialize a new vertex with the given item.
+
+        This vertex is initialized with no neighbours.
+
+        Preconditions:
+            - kind in {'user', 'book'}
+        """
+        super().__init__(item, set())
+        self.neighbours = {}
+
+
+class WeightedGraph(Graph):
+    """A weighted graph used to represent a friend network with weights representing their closeness.
+
+    Note that this is a subclass of the Graph class, and so inherits any methods
+    from that class that aren't overridden here.
+    """
+    # Private Instance Attributes:
+    #     - _vertices:
+    #         A collection of the vertices contained in this graph.
+    #         Maps item to _WeightedVertex object.
+    _vertices: dict[Any, _WeightedVertex]
+
+    def __init__(self) -> None:
+        """Initialize an empty graph (no vertices or edges)."""
+        self._vertices = {}
+
+        # This call isn't necessary, except to satisfy PythonTA.
+        Graph.__init__(self)
+
+    def add_vertex(self, item: Any) -> None:
+        """Add a vertex with the given item and kind to this graph.
+
+        The new vertex is not adjacent to any other vertices.
+        Do nothing if the given item is already in this graph.
+        """
+        if item not in self._vertices:
+            self._vertices[item] = _WeightedVertex(item)
+
+    def add_edge(self, item1: Any, item2: Any, weight: int = 1) -> None:
+        """Add an edge between the two vertices with the given items in this graph,
+        with the given weight.
+
+        Raise a ValueError if item1 or item2 do not appear as vertices in this graph.
+
+        Preconditions:
+            - item1 != item2
+        """
+        if item1 in self._vertices and item2 in self._vertices:
+            v1 = self._vertices[item1]
+            v2 = self._vertices[item2]
+
+            # Add the new edge
+            v1.neighbours[v2] = weight
+            v2.neighbours[v1] = weight
+        else:
+            # We didn't find an existing vertex for both items.
+            raise ValueError
+
+    def get_weight(self, item1: Any, item2: Any) -> int:
+        """Return the weight of the edge between the given items.
+
+        Return 0 if item1 and item2 are not adjacent.
+
+        Preconditions:
+            - item1 and item2 are vertices in this graph
+        """
+        v1 = self._vertices[item1]
+        v2 = self._vertices[item2]
+        return v1.neighbours.get(v2, 0)
+
+
+def load_friend_network(names_file: str, edges_file: str) -> tuple[Graph, WeightedGraph]:
     """Return a friend network graph corresponding to the given datasets.
 
     Preconditions:
@@ -168,12 +281,16 @@ def load_unweighted_friend_network(names_file: str, edges_file: str) -> Graph:
         - edges_file is the path to a txt file corresponding to the edges of the friend network
     """
     people = {}
-    graph = Graph()
-    graph.add_vertex('raven')
+    unweighted_network = Graph()
+    weighted_network = WeightedGraph()
+
+    # add the ego
+    unweighted_network.add_vertex('raven')
+    weighted_network.add_vertex('raven')
 
     with open(names_file) as f1, open(edges_file) as f2:
         names = f1.readlines()
-        i = random.randint(0, len(names))
+        i = random.randint(0, len(names) - 1)
 
         for line in f2:
             split_line = line.strip().split()
@@ -183,22 +300,29 @@ def load_unweighted_friend_network(names_file: str, edges_file: str) -> Graph:
             if user1 not in people:
                 people[user1] = names[i].strip()
                 names.pop(i)
-                i = random.randint(0, len(names))
+                i = random.randint(0, len(names) - 1)
 
-                graph.add_vertex(people[user1])
-                graph.add_edge(people[user1], 'raven')
+                unweighted_network.add_vertex(people[user1])
+                unweighted_network.add_edge(people[user1], 'raven')
+
+                weighted_network.add_vertex(people[user1])
+                weighted_network.add_edge(people[user1], 'raven', random.randint(1, 5))
 
             if user2 not in people:
                 people[user2] = names[i].strip()
                 names.pop(i)
-                i = random.randint(0, len(names))
+                i = random.randint(0, len(names) - 1)
 
-                graph.add_vertex(people[user2])
-                graph.add_edge(people[user2], 'raven')
+                unweighted_network.add_vertex(people[user2])
+                unweighted_network.add_edge(people[user2], 'raven')
 
-            graph.add_edge(people[user1], people[user2])
+                weighted_network.add_vertex(people[user2])
+                weighted_network.add_edge(people[user2], 'raven', random.randint(1, 5))
 
-    return graph
+            unweighted_network.add_edge(people[user1], people[user2])
+            weighted_network.add_edge(people[user1], people[user2], random.randint(1, 5))
+
+    return (unweighted_network, weighted_network)
 
 
 if __name__ == '__main__':
@@ -209,9 +333,9 @@ if __name__ == '__main__':
     # (In PyCharm, select the lines below and press Ctrl/Cmd + / to toggle comments.)
     # You can use "Run file in Python Console" to run PythonTA,
     # and then also test your methods manually in the console.
-    import python_ta
-    python_ta.check_all(config={
-        'extra-imports': ['random'],  # the names (strs) of imported modules
-        'allowed-io': ['load_unweighted_friend_network'],  # the names (strs) of functions that call print/open/input
-        'max-line-length': 120
-    })
+    # import python_ta
+    # python_ta.check_all(config={
+    #     'extra-imports': ['random'],  # the names (strs) of imported modules
+    #     'allowed-io': ['load_friend_network'],  # the names (strs) of functions that call print/open/input
+    #     'max-line-length': 120
+    # })
