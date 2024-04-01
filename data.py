@@ -20,6 +20,8 @@ This file is Copyright (c) 2024 CSC111 Teaching Team
 from __future__ import annotations
 from typing import Any
 import random
+from queue import PriorityQueue
+import math
 
 import networkx as nx
 
@@ -179,6 +181,61 @@ class Graph:
 
         return graph_nx
 
+    def get_friend_path(self, start: str, end: str) -> list[str]:
+        """Returns the shortest path of mutuals between 2 people in the graph
+
+        If there is no path, returns an empty list
+        """
+        start_vertex = self._vertices[start]
+        end_vertex = self._vertices[end]
+
+        parents = self._get_parents(start_vertex)
+
+        return self._reconstruct_path(start_vertex, end_vertex, parents)
+
+    def _get_parents(self, start: _Vertex) -> dict[_Vertex, _Vertex]:
+        """Returns a dictionary containing vertices (keys) which link back to their
+        "parent nodes" (values) from bfs graph traversal
+        """
+        queue = Queue()
+        queue.enqueue(start)
+
+        visited = {start}
+        parents = {}
+
+        while not queue.is_empty():
+            parent = queue.dequeue()
+
+            for neighbour in parent.neighbours:
+                if neighbour not in visited:
+                    visited.add(neighbour)
+                    queue.enqueue(neighbour)
+                    parents[neighbour] = parent
+
+        return parents
+
+    def _reconstruct_path(self, start: _Vertex, end: _Vertex, parents) -> list[str]:
+        """Reconstructs the shortest path between start to end by going backwards in the parents
+        dictionary starting from the end vertex.
+
+        The path is a list containing the items of the vertices
+
+        If there is no path between start and end, returns an empty list
+        """
+        path = []
+        current = end
+
+        while current != start:
+            if current not in parents:
+                return []
+            path.append(current)
+            current = parents[current]
+
+        path.append(start)
+        path.reverse()
+
+        return [person.item for person in path]
+
 
 class _WeightedVertex(_Vertex):
     """A vertex in a weighted graph.
@@ -271,6 +328,52 @@ class WeightedGraph(Graph):
         v1 = self._vertices[item1]
         v2 = self._vertices[item2]
         return v1.neighbours.get(v2, 0)
+
+    def get_friend_path(self, start: str, end: str) -> list[str]:
+        """Returns the shortest path of mutuals between 2 people in the graph
+
+        If there is no path, returns an empty list
+        """
+        start_vertex = self._vertices[start]
+        end_vertex = self._vertices[end]
+
+        parents = self._parents_weighted(start_vertex, end_vertex)
+
+        return self._reconstruct_path(start_vertex, end_vertex, parents)
+
+    def _parents_weighted(self, start: _WeightedVertex, end: _WeightedVertex) -> dict[_WeightedVertex, _WeightedVertex]:
+        """Uses Djikstra's algorithm to return a dictionary containing vertices (keys) which link back to their
+        "parent nodes" (values).
+        """
+        visited = set()
+        distances = {start: 0}
+        prev = {}
+        priority_queue = PriorityQueue()
+        priority_queue.put((0, id(start), start))
+
+        while not priority_queue.empty():
+            distance, _, vertex = priority_queue.get()
+            visited.add(vertex)
+            if distances[vertex] < distance:
+                continue
+
+            for neighbour in vertex.neighbours:
+                if neighbour in visited:
+                    continue
+
+                new_distance = distances[vertex] + vertex.neighbours[neighbour]
+                if neighbour not in distances:
+                    distances[neighbour] = math.inf
+
+                if new_distance < distances[neighbour]:
+                    prev[neighbour] = vertex
+                    distances[neighbour] = new_distance
+                    priority_queue.put((new_distance, id(neighbour), neighbour))
+
+            if vertex == end:
+                return prev
+
+        return prev
 
 
 def load_friend_network(names_file: str, edges_file: str) -> tuple[Graph, WeightedGraph]:

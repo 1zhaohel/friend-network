@@ -26,7 +26,7 @@ import math
 # TODO: add these functions as methods in Graph class
 
 
-def get_friend_path(graph: data.Graph, start: str, end: str, type = "unweighted") -> list[str]:
+def get_friend_path(graph: data.Graph, start: str, end: str, path_type="unweighted") -> list[str]:
     """Returns the shortest path of mutuals between 2 people in the graph
 
     If there is no path, returns an empty list
