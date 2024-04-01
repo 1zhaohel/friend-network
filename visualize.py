@@ -52,10 +52,11 @@ def visualize_graph(graph_tuple: tuple[data.Graph, data.WeightedGraph],
     x_values = [pos[k][0] for k in graph_nx.nodes]
     y_values = [pos[k][1] for k in graph_nx.nodes]
     labels = list(graph_nx.nodes)
-    kinds = [graph_nx.nodes[k]['kind'] for k in graph_nx.nodes]
+    kinds = [graph_nx.nodes[k].get('kind', 'unknown') for k in graph_nx.nodes]
+    # kinds = [graph_nx.nodes[k]['kind'] for k in graph_nx.nodes]  # error
 
     # TODO we can use this for if it is in the path or not
-    # colours = [BOOK_COLOUR if kind == 'book' else USER_COLOUR for kind in kinds]
+    colours = [BOOK_COLOUR if kind == 'book' else USER_COLOUR for kind in kinds]
 
     x_edges = []
     y_edges = []
