@@ -18,6 +18,8 @@ This file is Copyright (c) 2024 CSC111 Teaching Team
 """
 import data
 from data import Queue
+from queue import PriorityQueue
+import math
 
 # TODO: add these functions as methods in Graph class
 
@@ -29,12 +31,44 @@ def get_friend_path(graph: data.Graph, start: str, end: str) -> list[str]:
     """
     start_vertex = graph._vertices[start]
     end_vertex = graph._vertices[end]
-    parents = get_parents(start_vertex)
+    parents = get_parents_weighted(start_vertex)
 
     return reconstruct_path(start_vertex, end_vertex, parents)
 
 
-def get_parents(start: data._Vertex) -> dict[_Vertex, _Vertex]:
+def get_parents_weighted(start: data._Vertex, end:data._Vertex) -> dict[data._Vertex, data._Vertex]:
+    """Uses Djikstra's algorithm to return a dictionary containing vertices (keys) which link back to their
+    "parent nodes" (values).
+    """
+    visited = set()
+    distances = {start: 0}
+    prev = {}
+    priority_queue = PriorityQueue()
+    priority_queue.put((0, start))
+
+    while not priority_queue.empty():
+        vertex, distance = priority_queue.get()
+        visited.add(vertex)
+        if distances[vertex] < distance:
+            continue
+
+        for neighbour in vertex.neighbours:
+            if neighbour in visited:
+                continue
+
+            new_distance = distances[vertex] + vertex.neighbours[neighbour]
+            if neighbour not in distances:
+                distances[neighbour] = math.inf
+
+            if new_distance < distances[neighbour]:
+                prev[neighbour] = vertex
+                distances[neighbour] = new_distance
+                priority_queue.put((new_distance, neighbour))
+
+    return prev
+
+
+def get_parents(start: data._Vertex) -> dict[data._Vertex, data._Vertex]:
     """Returns a dictionary containing vertices (keys) which link back to their
     "parent nodes" (values) from bfs graph traversal
     """
@@ -43,7 +77,6 @@ def get_parents(start: data._Vertex) -> dict[_Vertex, _Vertex]:
 
     visited = {start}
     parents = {}
-    parents_with_str = {}
 
     while not queue.is_empty():
         parent = queue.dequeue()
@@ -53,7 +86,6 @@ def get_parents(start: data._Vertex) -> dict[_Vertex, _Vertex]:
                 visited.add(neighbour)
                 queue.enqueue(neighbour)
                 parents[neighbour] = parent
-                parents_with_str[neighbour.item] = parent.item
 
     return parents
 
