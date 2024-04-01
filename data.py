@@ -386,6 +386,7 @@ def load_friend_network(names_file: str, edges_file: str) -> tuple[Graph, Weight
     people = {}
     unweighted_network = Graph()
     weighted_network = WeightedGraph()
+    random.seed(1)
 
     # add the ego
     unweighted_network.add_vertex('raven')
