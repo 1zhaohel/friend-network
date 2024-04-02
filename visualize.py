@@ -18,7 +18,7 @@ please consult our Course Syllabus.
 This file is Copyright (c) 2024 CSC111 Teaching Team
 """
 import networkx as nx
-from plotly.graph_objs import Scatter, Figure
+from plotly.graph_objs import Figure, Scatter
 
 import data
 
