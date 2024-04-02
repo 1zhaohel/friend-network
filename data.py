@@ -250,7 +250,7 @@ class Graph:
         >>> edges == [('a', 'b'), ('b', 'c'), ('c', 'd')]
         True
         """
-        return [(path[i].item, path[i + 1].item) for i in range(len(path)-1)]
+        return [(path[i].item, path[i + 1].item) for i in range(len(path) - 1)]
 
 
 class _WeightedVertex(_Vertex):
@@ -369,7 +369,8 @@ class WeightedGraph(Graph):
         priority_queue.put((0, id(start), start))
 
         while not priority_queue.empty():
-            distance, _, vertex = priority_queue.get()
+            item = priority_queue.get()
+            distance, vertex = item[0], item[1]
             visited.add(vertex)
             if distances[vertex] < distance:
                 continue
@@ -454,9 +455,9 @@ if __name__ == '__main__':
     # (In PyCharm, select the lines below and press Ctrl/Cmd + / to toggle comments.)
     # You can use "Run file in Python Console" to run PythonTA,
     # and then also test your methods manually in the console.
-    # import python_ta
-    # python_ta.check_all(config={
-    #     'extra-imports': ['random'],  # the names (strs) of imported modules
-    #     'allowed-io': ['load_friend_network'],  # the names (strs) of functions that call print/open/input
-    #     'max-line-length': 120
-    # })
+    import python_ta
+    python_ta.check_all(config={
+        'extra-imports': ['random', 'math', 'queue', 'networkx'],  # the names (strs) of imported modules
+        'allowed-io': ['load_friend_network'],  # the names (strs) of functions that call print/open/input
+        'max-line-length': 120,
+    })
