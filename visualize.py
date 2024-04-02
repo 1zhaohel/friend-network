@@ -29,10 +29,7 @@ USER_COLOUR = 'rgb(105, 89, 205)'
 
 
 def visualize_graph(graph_tuple: tuple[data.Graph, data.WeightedGraph],
-                    layout: str = 'spring_layout',
-                    max_vertices: int = 5000,
-                    output_file: str = '', weighted: bool = False,
-                    path: list = None) -> None:
+                    start: str, end: str, weighted: bool) -> None:
     """Use plotly and networkx to visualize the given graph.
 
     Optional arguments:
@@ -46,82 +43,76 @@ def visualize_graph(graph_tuple: tuple[data.Graph, data.WeightedGraph],
     else:
         graph = graph_tuple[0]
 
-    graph_nx = graph.conv_networkx(max_vertices)
-    pos = getattr(nx, layout)(graph_nx)
-    # added
-    nx.set_node_attributes(graph_nx, pos, 'pos')
+    pos = getattr(nx, 'spring_layout')(graph.conv_networkx(5000))
+    nx.set_node_attributes(graph.conv_networkx(5000), pos, 'pos')
 
-    x_values = [pos[k][0] for k in graph_nx.nodes]
-    y_values = [pos[k][1] for k in graph_nx.nodes]
-    labels = list(graph_nx.nodes)
-    kinds = [graph_nx.nodes[k].get('kind', 'unknown') for k in graph_nx.nodes]
-    # kinds = [graph_nx.nodes[k]['kind'] for k in graph_nx.nodes]  # error
-
-    # TODO we can use this for if it is in the path or not
-    colours = [BOOK_COLOUR if kind == 'book' else USER_COLOUR for kind in kinds]
+    x_values = [pos[k][0] for k in graph.conv_networkx(5000).nodes]
+    y_values = [pos[k][1] for k in graph.conv_networkx(5000).nodes]
 
     x_edges = []
     y_edges = []
-    for edge in graph_nx.edges:
-        x_edges += [pos[edge[0]][0], pos[edge[1]][0], None]
-        y_edges += [pos[edge[0]][1], pos[edge[1]][1], None]
 
-    trace3 = Scatter(x=x_edges,
-                     y=y_edges,
-                     mode='lines',
-                     name='edges',
-                     line=dict(color='rgb(255,185,185)', width=1),
-                     hoverinfo='none',
-                     )
+    # Output path from user to target
+    print("Path to Target: ", end='')
+    for i in range(len(graph.get_friend_path(start, end))):
+        if i == 0:
+            print(f'{graph.get_friend_path(start, end)[i][0]}, {graph.get_friend_path(start, end)[i][1]}', end='')
+        else:
+            print(f', {graph.get_friend_path(start, end)[i][1]}', end='')
 
-    trace4 = Scatter(x=x_values,
-                     y=y_values,
-                     mode='markers',
-                     name='nodes',
-                     marker=dict(symbol='circle-dot',
-                                 size=5,
-                                 color='rgb(0,0,128)',
-                                 line=dict(color=VERTEX_BORDER_COLOUR, width=0.5)
-                                 ),
-                     text=labels,
-                     hovertemplate='%{text}',
-                     hoverlabel={'namelength': 0}
-                     )
+    x_highlight_edges = []
+    y_highlight_edges = []
 
-    data1 = [trace3, trace4]
+    for edge in graph.conv_networkx(5000).edges:
+        if edge in graph.get_friend_path(start, end) or (edge[1], edge[0]) in graph.get_friend_path(start, end):
+            x_highlight_edges += [pos[edge[0]][0], pos[edge[1]][0], None]
+            y_highlight_edges += [pos[edge[0]][1], pos[edge[1]][1], None]
+        else:
+            x_edges += [pos[edge[0]][0], pos[edge[1]][0], None]
+            y_edges += [pos[edge[0]][1], pos[edge[1]][1], None]
 
-    # added
-    if path:
-        path_trace = highlight_path(graph_nx, path)
-        data1.append(path_trace)
-
-    fig = Figure(data=data1)
+    fig = Figure(data=[Scatter(x=x_edges,
+                               y=y_edges,
+                               mode='lines',
+                               name='edges',
+                               line={"color": 'rgb(144,238,144)', "width": 0.5},
+                               hoverinfo='none',
+                               ), Scatter(x=x_values,
+                                          y=y_values,
+                                          mode='markers',
+                                          name='nodes',
+                                          marker={"symbol": 'circle-dot', "size": 5, "color": 'rgb(0,0,128)',
+                                                  "line": {"color": VERTEX_BORDER_COLOUR, "width": 0.5}},
+                                          text=list(graph.conv_networkx(5000).nodes),
+                                          hovertemplate='%{text}',
+                                          hoverlabel={'namelength': 0}
+                                          ), Scatter(x=x_highlight_edges,
+                                                     y=y_highlight_edges,
+                                                     mode='lines',
+                                                     name='edges',
+                                                     line={"color": 'rgb(0,0,0)', "width": 2},
+                                                     hoverinfo='none',
+                                                     )])
     fig.update_layout({'showlegend': False})
     fig.update_xaxes(showgrid=False, zeroline=False, visible=False)
     fig.update_yaxes(showgrid=False, zeroline=False, visible=False)
 
-    if output_file == '':
-        fig.show()
-    else:
-        fig.write_image(output_file)
+    fig.show()
 
 
-def highlight_path(graph_nx,
-                   path: list[tuple]):
-    """
-    Highlight the path between two plots.
-    """
-    x_edges = []
-    y_edges = []
-    for edge in path:
-        x_edges += [graph_nx.nodes[edge[0]]['pos'][0], graph_nx.nodes[edge[1]]['pos'][0], None]
-        y_edges += [graph_nx.nodes[edge[0]]['pos'][1], graph_nx.nodes[edge[1]]['pos'][1], None]
+if __name__ == '__main__':
+    import doctest
 
-    return Scatter(
-        x=x_edges,
-        y=y_edges,
-        mode='lines',
-        name='path',
-        line=dict(color='rgb(255,0,0)', width=3),
-        hoverinfo='none',
-    )
+    doctest.testmod(verbose=True)
+
+    # When you are ready to check your work with python_ta, uncomment the following lines.
+    # (In PyCharm, select the lines below and press Ctrl/Cmd + / to toggle comments.)
+    # You can use "Run file in Python Console" to run PythonTA,
+    # and then also test your methods manually in the console.
+    import python_ta
+
+    python_ta.check_all(config={
+        'extra-imports': ['random', 'networkx', 'data', 'plotly.graph_objs'],
+        'allowed-io': ['load_friend_network', 'visualize_graph'],
+        'max-line-length': 120
+    })

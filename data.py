@@ -251,6 +251,15 @@ class Graph:
         True
         """
         return [(path[i].item, path[i + 1].item) for i in range(len(path) - 1)]
+<<<<<<< HEAD
+=======
+
+    def get_vertices(self) -> dict[Any, _Vertex]:
+        """
+        Return vertices of the graph.
+        """
+        return self._vertices
+>>>>>>> 2f46ae5e6566edb5664bc3c32ca78f0bfc0bcea8
 
 
 class _WeightedVertex(_Vertex):
@@ -444,11 +453,12 @@ def load_friend_network(names_file: str, edges_file: str) -> tuple[Graph, Weight
             unweighted_network.add_edge(people[user1], people[user2])
             weighted_network.add_edge(people[user1], people[user2], random.randint(1, 5))
 
-    return (unweighted_network, weighted_network)
+    return unweighted_network, weighted_network
 
 
 if __name__ == '__main__':
     import doctest
+
     doctest.testmod(verbose=True)
 
     # When you are ready to check your work with python_ta, uncomment the following lines.
