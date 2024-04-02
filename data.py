@@ -237,7 +237,7 @@ class Graph:
 
         return path
 
-    def path_to_edges(self, path: list[_Vertex]) -> list[tuple:_Vertex]:
+    def path_to_edges(self, path: list[_Vertex]) -> list[tuple: str]:
         """Takes a path between vertices and converts it into a corresponding list of edges
 
         >>> g = Graph()
@@ -247,10 +247,10 @@ class Graph:
         >>> v4 = _Vertex('d', set())
         >>> a_path = [v1, v2, v3, v4]
         >>> edges = g.path_to_edges(a_path)
-        >>> edges == [(v1, v2), (v2, v3), (v3, v4)]
+        >>> edges == [('a', 'b'), ('b', 'c'), ('c', 'd')]
         True
         """
-        return [(path[i], path[i + 1]) for i in range(len(path)-1)]
+        return [(path[i].item, path[i + 1].item) for i in range(len(path)-1)]
 
 
 class _WeightedVertex(_Vertex):
