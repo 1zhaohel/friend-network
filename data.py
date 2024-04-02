@@ -449,7 +449,7 @@ def load_friend_network(names_file: str, edges_file: str) -> tuple[Graph, Weight
             unweighted_network.add_edge(people[user1], people[user2])
             weighted_network.add_edge(people[user1], people[user2], random.randint(1, 5))
 
-    return (unweighted_network, weighted_network)
+    return unweighted_network, weighted_network
 
 
 if __name__ == '__main__':
@@ -461,9 +461,10 @@ if __name__ == '__main__':
     # (In PyCharm, select the lines below and press Ctrl/Cmd + / to toggle comments.)
     # You can use "Run file in Python Console" to run PythonTA,
     # and then also test your methods manually in the console.
-    # import python_ta
-    # python_ta.check_all(config={
-    #     'extra-imports': ['random'],  # the names (strs) of imported modules
-    #     'allowed-io': ['load_friend_network'],  # the names (strs) of functions that call print/open/input
-    #     'max-line-length': 120
-    # })
+    import python_ta
+
+    python_ta.check_all(config={
+        'extra-imports': ['random', 'queue', 'math', 'networkx'],  # the names (strs) of imported modules
+        'allowed-io': ['load_friend_network'],  # the names (strs) of functions that call print/open/input
+        'max-line-length': 120
+    })
