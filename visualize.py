@@ -31,7 +31,8 @@ USER_COLOUR = 'rgb(105, 89, 205)'
 def visualize_graph(graph_tuple: tuple[data.Graph, data.WeightedGraph],
                     layout: str = 'spring_layout',
                     max_vertices: int = 5000,
-                    output_file: str = '', weighted: bool = False) -> None:
+                    output_file: str = '', weighted: bool = False,
+                    path: list = None) -> None:
     """Use plotly and networkx to visualize the given graph.
 
     Optional arguments:
@@ -46,8 +47,9 @@ def visualize_graph(graph_tuple: tuple[data.Graph, data.WeightedGraph],
         graph = graph_tuple[0]
 
     graph_nx = graph.conv_networkx(max_vertices)
-
     pos = getattr(nx, layout)(graph_nx)
+    # added
+    nx.set_node_attributes(graph_nx, pos, 'pos')
 
     x_values = [pos[k][0] for k in graph_nx.nodes]
     y_values = [pos[k][1] for k in graph_nx.nodes]
@@ -64,12 +66,11 @@ def visualize_graph(graph_tuple: tuple[data.Graph, data.WeightedGraph],
         x_edges += [pos[edge[0]][0], pos[edge[1]][0], None]
         y_edges += [pos[edge[0]][1], pos[edge[1]][1], None]
 
-    # TODO change the colours values below
     trace3 = Scatter(x=x_edges,
                      y=y_edges,
                      mode='lines',
                      name='edges',
-                     line=dict(color=LINE_COLOUR, width=1),
+                     line=dict(color='rgb(255,185,185)', width=1),
                      hoverinfo='none',
                      )
 
@@ -79,7 +80,7 @@ def visualize_graph(graph_tuple: tuple[data.Graph, data.WeightedGraph],
                      name='nodes',
                      marker=dict(symbol='circle-dot',
                                  size=5,
-                                 color='rgb(89, 205, 105)',
+                                 color='rgb(0,0,128)',
                                  line=dict(color=VERTEX_BORDER_COLOUR, width=0.5)
                                  ),
                      text=labels,
@@ -88,6 +89,12 @@ def visualize_graph(graph_tuple: tuple[data.Graph, data.WeightedGraph],
                      )
 
     data1 = [trace3, trace4]
+
+    # added
+    if path:
+        path_trace = highlight_path(graph_nx, path)
+        data1.append(path_trace)
+
     fig = Figure(data=data1)
     fig.update_layout({'showlegend': False})
     fig.update_xaxes(showgrid=False, zeroline=False, visible=False)
@@ -97,3 +104,24 @@ def visualize_graph(graph_tuple: tuple[data.Graph, data.WeightedGraph],
         fig.show()
     else:
         fig.write_image(output_file)
+
+
+def highlight_path(graph_nx,
+                   path: list[tuple]):
+    """
+    Highlight the path between two plots.
+    """
+    x_edges = []
+    y_edges = []
+    for edge in path:
+        x_edges += [graph_nx.nodes[edge[0]]['pos'][0], graph_nx.nodes[edge[1]]['pos'][0], None]
+        y_edges += [graph_nx.nodes[edge[0]]['pos'][1], graph_nx.nodes[edge[1]]['pos'][1], None]
+
+    return Scatter(
+        x=x_edges,
+        y=y_edges,
+        mode='lines',
+        name='path',
+        line=dict(color='rgb(255,0,0)', width=3),
+        hoverinfo='none',
+    )
