@@ -16,3 +16,11 @@ please consult our Course Syllabus.
 
 This file is Copyright (c) 2024 CSC111 Teaching Team
 """
+
+user = input("Enter your name: ")
+target = input("Enter target: ")
+
+from data import load_friend_network
+my_graph = load_friend_network('data/first-names.txt', 'data/edges.txt')
+from visualize import visualize_graph
+visualize_graph(my_graph, user, target)
