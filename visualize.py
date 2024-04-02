@@ -29,10 +29,10 @@ USER_COLOUR = 'rgb(105, 89, 205)'
 
 
 def visualize_graph(graph_tuple: tuple[data.Graph, data.WeightedGraph],
-                    start: str, end: str,
+                    start: str, end: str, weighted: bool,
                     layout: str = 'spring_layout',
                     max_vertices: int = 5000,
-                    output_file: str = '', weighted: bool = False) -> None:
+                    output_file: str = '') -> None:
     """Use plotly and networkx to visualize the given graph.
 
     Optional arguments:
@@ -56,12 +56,21 @@ def visualize_graph(graph_tuple: tuple[data.Graph, data.WeightedGraph],
 
     x_edges = []
     y_edges = []
-    path = graph.get_friend_path(start, end)  # TODO check if returns list of edges (tuples of items)
+    path = graph.get_friend_path(start, end)  # returns list of edges (tuples of items)
+
+    # Output path from user to target
+    print("Path to Target: ", end='')
+    for i in range(len(path)):
+        if i == 0:
+            print(f'{path[i][0]}, {path[i][1]}', end='')
+        else:
+            print(f', {path[i][1]}', end='')
+
     x_highlight_edges = []
     y_highlight_edges = []
 
     for edge in graph_nx.edges:
-        if edge in path:
+        if edge in path or (edge[1], edge[0]) in path:
             x_highlight_edges += [pos[edge[0]][0], pos[edge[1]][0], None]
             y_highlight_edges += [pos[edge[0]][1], pos[edge[1]][1], None]
         else:
@@ -72,7 +81,7 @@ def visualize_graph(graph_tuple: tuple[data.Graph, data.WeightedGraph],
                               y=y_highlight_edges,
                               mode='lines',
                               name='edges',
-                              line=dict(color='rgb(255,0,0)', width=1),
+                              line=dict(color='rgb(255,0,0)', width=2),
                               hoverinfo='none',
                               )
 
@@ -80,7 +89,7 @@ def visualize_graph(graph_tuple: tuple[data.Graph, data.WeightedGraph],
                           y=y_edges,
                           mode='lines',
                           name='edges',
-                          line=dict(color='rgb(255,185,185)', width=1),
+                          line=dict(color='rgb(144,238,144)', width=0.5),
                           hoverinfo='none',
                           )
 
@@ -98,7 +107,7 @@ def visualize_graph(graph_tuple: tuple[data.Graph, data.WeightedGraph],
                           hoverlabel={'namelength': 0}
                           )
 
-    data1 = [trace_highlight, trace_edges, trace_nodes]
+    data1 = [trace_edges, trace_nodes, trace_highlight]
 
     fig = Figure(data=data1)
     fig.update_layout({'showlegend': False})
