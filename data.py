@@ -181,7 +181,7 @@ class Graph:
 
         return graph_nx
 
-    def get_friend_path(self, start: str, end: str) -> list[str]:
+    def get_friend_path(self, start: str, end: str) -> list[_Vertex]:
         """Returns the shortest path of mutuals between 2 people in the graph
 
         If there is no path, returns an empty list
@@ -214,7 +214,7 @@ class Graph:
 
         return parents
 
-    def _reconstruct_path(self, start: _Vertex, end: _Vertex, parents) -> list[str]:
+    def _reconstruct_path(self, start: _Vertex, end: _Vertex, parents: dict[_Vertex, _Vertex]) -> list[_Vertex]:
         """Reconstructs the shortest path between start to end by going backwards in the parents
         dictionary starting from the end vertex.
 
@@ -234,7 +234,7 @@ class Graph:
         path.append(start)
         path.reverse()
 
-        return [person.item for person in path]
+        return path
 
 
 class _WeightedVertex(_Vertex):
@@ -329,7 +329,7 @@ class WeightedGraph(Graph):
         v2 = self._vertices[item2]
         return v1.neighbours.get(v2, 0)
 
-    def get_friend_path(self, start: str, end: str) -> list[str]:
+    def get_friend_path(self, start: str, end: str) -> list[_Vertex | _WeightedVertex]:
         """Returns the shortest path of mutuals between 2 people in the graph
 
         If there is no path, returns an empty list
