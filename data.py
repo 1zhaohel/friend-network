@@ -190,8 +190,9 @@ class Graph:
         end_vertex = self._vertices[end]
 
         parents = self._get_parents(start_vertex)
+        reconstructed_path = self._reconstruct_path(start_vertex, end_vertex, parents)
 
-        return self._reconstruct_path(start_vertex, end_vertex, parents)
+        return self.path_to_edges(reconstructed_path)
 
     def _get_parents(self, start: _Vertex) -> dict[_Vertex, _Vertex]:
         """Returns a dictionary containing vertices (keys) which link back to their
@@ -235,6 +236,21 @@ class Graph:
         path.reverse()
 
         return path
+
+    def path_to_edges(self, path: list[_Vertex]) -> list[tuple:_Vertex]:
+        """Takes a path between vertices and converts it into a corresponding list of edges
+
+        >>> g = Graph()
+        >>> v1 = _Vertex('a', set())
+        >>> v2 = _Vertex('b', set())
+        >>> v3 = _Vertex('c', set())
+        >>> v4 = _Vertex('d', set())
+        >>> a_path = [v1, v2, v3, v4]
+        >>> edges = g.path_to_edges(a_path)
+        >>> edges == [(v1, v2), (v2, v3), (v3, v4)]
+        True
+        """
+        return [(path[i], path[i + 1]) for i in range(len(path)-1)]
 
 
 class _WeightedVertex(_Vertex):
@@ -339,7 +355,8 @@ class WeightedGraph(Graph):
 
         parents = self._parents_weighted(start_vertex, end_vertex)
 
-        return self._reconstruct_path(start_vertex, end_vertex, parents)
+        reconstructed_path = self._reconstruct_path(start_vertex, end_vertex, parents)
+        return self.path_to_edges(reconstructed_path)
 
     def _parents_weighted(self, start: _WeightedVertex, end: _WeightedVertex) -> dict[_WeightedVertex, _WeightedVertex]:
         """Uses Djikstra's algorithm to return a dictionary containing vertices (keys) which link back to their
