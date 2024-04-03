@@ -1,0 +1,9 @@
+# CSC111 Winter 2024: Python libraries needed for friend network.
+
+# Testing and code checking
+pytest
+python-ta~=2.7.0
+
+# Graphics and data visualization
+plotly>=5.18.0
+networkx

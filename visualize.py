@@ -1,4 +1,4 @@
-"""CSC111 Winter 2024 Project 2: Visualize Data (Part 3)
+"""CSC111 Winter 2024 Project 2: Visualize Data (Part 2)
 
 Instructions (READ THIS FIRST!)
 ===============================
