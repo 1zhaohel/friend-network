@@ -19,6 +19,7 @@ This file is Copyright (c) 2024 CSC111 Teaching Team
 """
 import networkx as nx
 from plotly.graph_objs import Figure, Scatter
+import plotly
 
 import data
 
@@ -97,7 +98,8 @@ def visualize_graph(graph_tuple: tuple[data.Graph, data.WeightedGraph],
     fig.update_xaxes(showgrid=False, zeroline=False, visible=False)
     fig.update_yaxes(showgrid=False, zeroline=False, visible=False)
 
-    fig.show()
+    # fig.show()
+    plotly.offline.plot(fig)
 
 
 if __name__ == '__main__':

@@ -48,8 +48,11 @@ def run() -> None:
 
     visualize_graph(my_graph, user, target, is_weighted)
 
-    print("\n")
-    exit("Program finished.")
+    choice_to_continue = input("\nDo you wish to find the path with another user? (y/n): ")
+    if choice_to_continue == "y":
+        run()
+    else:
+        exit("Thank you for using!")
 
 
 if __name__ == '__main__':

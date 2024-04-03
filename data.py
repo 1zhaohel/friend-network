@@ -181,7 +181,6 @@ class Graph:
 
         return graph_nx
 
-    # TODO check if this returns empty list if there is no path
     def get_friend_path(self, start: str, end: str) -> list[_Vertex]:
         """Returns the shortest path of mutuals between 2 people in the graph
 
@@ -195,7 +194,6 @@ class Graph:
 
         return self.path_to_edges(reconstructed_path)
 
-    # TODO: Precondition?
     def _get_parents(self, start: _Vertex) -> dict[_Vertex, _Vertex]:
         """Returns a dictionary containing vertices (keys) which link back to their
         "parent nodes" (values) from bfs graph traversal
@@ -217,7 +215,6 @@ class Graph:
 
         return parents
 
-    # TODO check if returns empty list for no path
     def _reconstruct_path(self, start: _Vertex, end: _Vertex, parents: dict[_Vertex, _Vertex]) -> list[_Vertex]:
         """Reconstructs the shortest path between start to end by going backwards in the parents
         dictionary starting from the end vertex.
@@ -240,7 +237,6 @@ class Graph:
 
         return path
 
-    # TODO: preconditions
     def path_to_edges(self, path: list[_Vertex]) -> list[tuple: str]:
         """Takes a path between vertices and converts it into a corresponding list of edges
 
@@ -256,7 +252,6 @@ class Graph:
         """
         return [(path[i].item, path[i + 1].item) for i in range(len(path) - 1)]
 
-    # TODO: any preconditions?
     def get_vertices(self) -> dict[Any, _Vertex]:
         """
         Return vertices of the graph.
@@ -369,10 +364,14 @@ class WeightedGraph(Graph):
         reconstructed_path = self._reconstruct_path(start_vertex, end_vertex, parents)
         return self.path_to_edges(reconstructed_path)
 
-    # TODO: preconditions?
     def _parents_weighted(self, start: _WeightedVertex, end: _WeightedVertex) -> dict[_WeightedVertex, _WeightedVertex]:
-        """Uses Djikstra's algorithm to return a dictionary containing vertices (keys) which link back to their
+        """
+        Uses Djikstra's algorithm to return a dictionary containing vertices (keys) which link back to their
         "parent nodes" (values).
+
+        Preconditions:
+            - start in self._vertices.values()
+            - end in self._vertices.values()
         """
         visited = set()
         distances = {start: 0}
