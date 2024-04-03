@@ -3,8 +3,9 @@
 Instructions (READ THIS FIRST!)
 ===============================
 
-This Python module contains classes and functions responsible for reading data from our dataset
-and creating an unweighted and weighted graph.
+This Python module contains classes and functions responsible for reading data from our dataset,
+creating an unweighted and weighted graph for the friend network, and finding the shortest path
+in the graphs.
 
 Copyright and Usage Information
 ===============================
@@ -12,10 +13,9 @@ Copyright and Usage Information
 This file is provided solely for the personal and private use of students
 taking CSC111 at the University of Toronto St. George campus. All forms of
 distribution of this code, whether as given or with any changes, are
-expressly prohibited. For more information on copyright for CSC111 materials,
-please consult our Course Syllabus.
+expressly prohibited.
 
-This file is Copyright (c) 2024 CSC111 Teaching Team
+This file is Copyright (c) 2024 CSC111 Friend Network
 """
 from __future__ import annotations
 from typing import Any
@@ -97,7 +97,7 @@ class _Vertex:
 
 
 class Graph:
-    """A graph.
+    """A graph used to represent a friend network.
 
     Representation Invariants:
         - all(item == self._vertices[item].item for item in self._vertices)
@@ -253,8 +253,7 @@ class Graph:
         return [(path[i].item, path[i + 1].item) for i in range(len(path) - 1)]
 
     def get_vertices(self) -> dict[Any, _Vertex]:
-        """
-        Return vertices of the graph.
+        """Return the graph's vertices.
         """
         return self._vertices
 
@@ -365,9 +364,8 @@ class WeightedGraph(Graph):
         return self.path_to_edges(reconstructed_path)
 
     def _parents_weighted(self, start: _WeightedVertex, end: _WeightedVertex) -> dict[_WeightedVertex, _WeightedVertex]:
-        """
-        Uses Djikstra's algorithm to return a dictionary containing vertices (keys) which link back to their
-        "parent nodes" (values).
+        """Uses Djikstra's algorithm to return a dictionary containing vertices (keys)
+        which link back to their 'parent nodes' (values).
 
         Preconditions:
             - start in self._vertices.values()
@@ -419,9 +417,11 @@ def load_friend_network(names_file: str, edges_file: str) -> tuple[Graph, Weight
     people = {}
     unweighted_network = Graph()
     weighted_network = WeightedGraph()
+
+    # Used to ensure the network will have the same names each time
     random.seed(1)
 
-    # add the ego
+    # Add the ego
     unweighted_network.add_vertex('raven')
     weighted_network.add_vertex('raven')
 
@@ -433,7 +433,7 @@ def load_friend_network(names_file: str, edges_file: str) -> tuple[Graph, Weight
             split_line = line.strip().split()
             user1, user2 = split_line[0], split_line[1]
 
-            # map new user to name, add user to graph, create edge between user and ego (raven)
+            # Map new user to name, add user to graph, create edge between user and ego (raven)
             if user1 not in people:
                 people[user1] = names[i].strip()
                 names.pop(i)

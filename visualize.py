@@ -3,8 +3,8 @@
 Instructions (READ THIS FIRST!)
 ===============================
 
-This Python module contains classes responsible for displaying the results
-of the computations.
+This Python module contains the function responsible for displaying the shortest path
+in the graph.
 
 Copyright and Usage Information
 ===============================
@@ -12,10 +12,9 @@ Copyright and Usage Information
 This file is provided solely for the personal and private use of students
 taking CSC111 at the University of Toronto St. George campus. All forms of
 distribution of this code, whether as given or with any changes, are
-expressly prohibited. For more information on copyright for CSC111 materials,
-please consult our Course Syllabus.
+expressly prohibited.
 
-This file is Copyright (c) 2024 CSC111 Teaching Team
+This file is Copyright (c) 2024 CSC111 Friend Network
 """
 import networkx as nx
 from plotly.graph_objs import Figure, Scatter
@@ -32,12 +31,6 @@ USER_COLOUR = 'rgb(105, 89, 205)'
 def visualize_graph(graph_tuple: tuple[data.Graph, data.WeightedGraph],
                     start: str, end: str, weighted: bool) -> None:
     """Use plotly and networkx to visualize the given graph.
-
-    Optional arguments:
-        - layout: which graph layout algorithm to use
-        - max_vertices: the maximum number of vertices that can appear in the graph
-        - output_file: a filename to save the plotly image to (rather than displaying
-            in your web browser)
     """
     if weighted:
         graph = graph_tuple[1]
@@ -53,8 +46,8 @@ def visualize_graph(graph_tuple: tuple[data.Graph, data.WeightedGraph],
     x_edges = []
     y_edges = []
 
-    # Output path from user to target
-    print("Path to Target: ", end='')
+    # Output path from user to target in console
+    print("\nPath to Target: ", end='')
     for i in range(len(graph.get_friend_path(start, end))):
         if i == 0:
             print(f'{graph.get_friend_path(start, end)[i][0]}, {graph.get_friend_path(start, end)[i][1]}', end='')
@@ -114,7 +107,7 @@ if __name__ == '__main__':
     import python_ta
 
     python_ta.check_all(config={
-        'extra-imports': ['random', 'networkx', 'data', 'plotly.graph_objs'],
-        'allowed-io': ['load_friend_network', 'visualize_graph'],
+        'extra-imports': ['networkx', 'data', 'plotly.graph_objs', 'plotly'],
+        'allowed-io': ['visualize_graph'],
         'max-line-length': 120
     })
