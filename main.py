@@ -1,4 +1,4 @@
-"""CSC111 Winter 2024 Project 2: Run Program (Part 4)
+"""CSC111 Winter 2024 Project 2: Run Program (Part 3)
 
 Instructions (READ THIS FIRST!)
 ===============================
@@ -53,23 +53,3 @@ def run() -> None:
         run()
     else:
         exit("Thank you for using!")
-
-
-if __name__ == '__main__':
-    import doctest
-
-    doctest.testmod(verbose=True)
-
-    # When you are ready to check your work with python_ta, uncomment the following lines.
-    # (In PyCharm, select the lines below and press Ctrl/Cmd + / to toggle comments.)
-    # You can use "Run file in Python Console" to run PythonTA,
-    # and then also test your methods manually in the console.
-    import python_ta
-
-    python_ta.check_all(config={
-        'extra-imports': ['random', 'networkx', 'data', 'plotly.graph_objs', 'visualize'],
-        'allowed-io': ['run'],
-        'max-line-length': 120
-    })
-
-    run()
